@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Users, Mail, Phone } from "lucide-react";
 import API from '../api'
 import toast from "react-hot-toast";
 
@@ -75,123 +76,170 @@ export default function EmployeeList() {
   };
 
   return (
-    <div className="p-4">
-      {/* Header */}
-      <div className="bg-yellow-300 px-4 py-2 font-semibold text-lg rounded-t-md">
-        Employee List
-      </div>
-
-      {/* Controls */}
-      <div className="flex flex-col md:flex-row justify-between items-center bg-blue-100 p-3 rounded-b-md">
-        <p className="font-medium text-gray-700">
-          Total Count: {filteredEmployees.length}
-        </p>
-        <div className="flex gap-2 mt-2 md:mt-0">
-          <Link
-            to="/create-employee"
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md shadow"
-          >
-            Create Employee
-          </Link>
-          <input
-            type="text"
-            placeholder="Enter Search Keyword"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border px-3 py-2 rounded-md w-52"
-          />
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="bg-white shadow-xl rounded-2xl p-6 mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+                <Users className="mr-3 h-8 w-8 text-blue-600" />
+                Employee Management
+              </h1>
+             </div>
+            <div className="flex items-center gap-4">
+              <div className="bg-blue-50 px-4 py-2 rounded-lg">
+                <span className="text-sm font-medium text-blue-700">Total Employees: </span>
+                <span className="text-lg font-bold text-blue-800">{filteredEmployees.length}</span>
+              </div>
+              <Link
+                to="/create-employee"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center shadow-lg"
+              >
+                <Plus className="mr-2 h-5 w-5" />
+                Add Employee
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto mt-4">
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead className="bg-blue-100">
-            <tr>
-              <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("id")}>Unique ID</th>
-              <th className="py-2 px-4 border">Image</th>
-              <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("name")}>Name</th>
-              <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("email")}>Email</th>
-              <th className="py-2 px-4 border">Mobile No</th>
-              <th className="py-2 px-4 border">Designation</th>
-              <th className="py-2 px-4 border">Gender</th>
-              <th className="py-2 px-4 border">Course</th>
-              <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("createdAt")}>Create Date</th>
-              <th className="py-2 px-4 border">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((emp) => (
-              <tr key={emp.id} className="hover:bg-gray-50">
-                <td className="py-2 px-4 border">{emp.id}</td>
-                <td className="py-2 px-4 border">
-                  <img
-                    src={`${process.env.REACT_APP_BASE_URL}/${emp.image.replace("\\", "/")}`}
-                    alt={emp.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                </td>
-                <td className="py-2 px-4 border">{emp.name}</td>
-                <td className="py-2 px-4 border text-blue-600 underline">
-                  {emp.email}
-                </td>
-                <td className="py-2 px-4 border">{emp.mobile}</td>
-                <td className="py-2 px-4 border">{emp.designation}</td>
-                <td className="py-2 px-4 border">{emp.gender}</td>
-                <td className="py-2 px-4 border">{emp.course}</td>
-                <td className="py-2 px-4 border">
-                  {new Date(emp.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </td>
-                <td className="py-2 px-4 border space-x-2">
-                  <Link
-                    to={`/update-employee/${emp._id}`}
-                    className="text-blue-500 hover:underline"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    className="text-red-500 hover:underline"
-                    onClick={() => handleDelete(emp._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        {/* Search and Filters */}
+        <div className="bg-white shadow-xl rounded-2xl p-6 mb-6">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by name, email, or ID..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              />
+            </div>
+          </div>
+        </div>
 
-      {/* Pagination Controls */}
-      <div className="flex justify-center mt-4 gap-2">
-        <button
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`px-3 py-1 rounded ${currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
-              }`}
-          >
-            {i + 1}
-          </button>
-        ))}
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
+        {/* Table */}
+        <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+                <tr>
+                  <th className="py-4 px-6 text-left font-semibold">ID</th>
+                  <th className="py-4 px-6 text-left font-semibold">Profile</th>
+                  <th className="py-4 px-6 text-left font-semibold cursor-pointer hover:bg-blue-700 transition" onClick={() => handleSort("name")}>
+                    Name {sortConfig.key === "name" && (sortConfig.direction === "asc" ? "↑" : "↓")}
+                  </th>
+                  <th className="py-4 px-6 text-left font-semibold cursor-pointer hover:bg-blue-700 transition" onClick={() => handleSort("email")}>
+                    Email {sortConfig.key === "email" && (sortConfig.direction === "asc" ? "↑" : "↓")}
+                  </th>
+                  <th className="py-4 px-6 text-left font-semibold">Mobile</th>
+                  <th className="py-4 px-6 text-left font-semibold">Gender</th>
+                  <th className="py-4 px-6 text-left font-semibold">Course</th>
+                  <th className="py-4 px-6 text-left font-semibold cursor-pointer hover:bg-blue-700 transition" onClick={() => handleSort("createdAt")}>
+                    Join Date {sortConfig.key === "createdAt" && (sortConfig.direction === "asc" ? "↑" : "↓")}
+                  </th>
+                  <th className="py-4 px-6 text-center font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedData.map((emp) => (
+                  <tr key={emp.id} className="hover:bg-gray-50 border-b border-gray-100 transition">
+                    <td className="py-4 px-6 font-medium text-gray-900">{emp.id}</td>
+                    <td className="py-4 px-6">
+                      <img
+                        src={`${process.env.REACT_APP_BASE_URL}/${emp.image.replace("\\", "/")}`}
+                        alt={emp.name}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                      />
+                    </td>
+                    <td className="py-4 px-6 font-medium text-gray-900">{emp.name}</td>
+                    <td className="py-4 px-6 text-blue-600 hover:text-blue-800 transition flex items-center">
+                      <Mail className="mr-2 h-4 w-4" />
+                      {emp.email}
+                    </td>
+                    <td className="py-4 px-6 text-gray-700 flex items-center">
+                      <Phone className="mr-2 h-4 w-4 text-gray-400" />
+                      {emp.mobile}
+                    </td>
+                    <td className="py-4 px-6">
+                      <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                        {emp.designation}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-gray-700">{emp.gender}</td>
+                    <td className="py-4 px-6">
+                      <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                        {emp.course}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-gray-700">
+                      {new Date(emp.createdAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="flex items-center justify-center space-x-2">
+                        <Link
+                          to={`/update-employee/${emp._id}`}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                          title="Edit Employee"
+                        >
+                          <Edit className="h-5 w-5" />
+                        </Link>
+                        <button
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                          onClick={() => handleDelete(emp._id)}
+                          title="Delete Employee"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="bg-gray-50 px-6 py-4 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Showing {Math.min((currentPage - 1) * pageSize + 1, filteredEmployees.length)} to {Math.min(currentPage * pageSize, filteredEmployees.length)} of {filteredEmployees.length} employees
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+                className="p-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-2 rounded-lg border transition ${
+                    currentPage === i + 1
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+                className="p-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

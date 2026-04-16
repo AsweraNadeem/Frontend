@@ -36,6 +36,30 @@ export default function Navbar() {
               >
                 Employee List
               </Link>
+              <Link
+                to="/leave"
+                className={`px-3 py-2 rounded-md transition ${isActive("/leave")}`}
+              >
+                Leave
+              </Link>
+              <Link
+                to="/attendance"
+                className={`px-3 py-2 rounded-md transition ${isActive("/attendance")}`}
+              >
+                Attendance
+              </Link>
+              <Link
+                to="/performance"
+                className={`px-3 py-2 rounded-md transition ${isActive("/performance")}`}
+              >
+                Performance
+              </Link>
+              <Link
+                to="/payroll"
+                className={`px-3 py-2 rounded-md transition ${isActive("/payroll")}`}
+              >
+                Payroll
+              </Link>
             </>
           ) : (
             <h1 className="font-bold text-xl text-blue-900 tracking-wide">

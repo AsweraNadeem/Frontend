@@ -1,10 +1,10 @@
 import axios from "axios";
 
-// Create React App uses process.env, NOT import.meta
+// If Vercel has a URL, use it. Otherwise, use your local computer.
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
 const API = axios.create({ 
-  baseURL: BASE_URL 
+  baseURL: BASE_URL.replace(/\/$/, "") // Clean up any extra slashes
 });
 
 API.interceptors.request.use((req) => {

@@ -1,19 +1,9 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import API from "../api";
-
 export default function Dashboard() {
-
   return (
-    <div className="min-h-screen flex flex-col">
-
-      <div className="bg-yellow-300 p-3 text-lg font-semibold">
-        DashBord
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="bg-white rounded-3xl shadow-xl p-10 max-w-3xl text-center">
+        <h1 className="text-4xl font-bold text-gray-900">Dashboard</h1>
       </div>
-      
-      <main className="flex-1 flex items-center justify-center text-2xl font-medium">
-        Welcome Admin Panel
-      </main>
     </div>
   );
 }

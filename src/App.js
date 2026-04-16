@@ -5,6 +5,10 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import EmployeeList from "./pages/EmployeeList";
 import CreateUpdateEmployee from "./pages/CreateUpdateEmployee";
+import Leave from "./pages/Leave";
+import Attendance from "./pages/Attendance";
+import Performance from "./pages/Performance";
+import Payroll from "./pages/Payroll";
 import "./App.css";
 import { Toaster } from "react-hot-toast";
 
@@ -23,6 +27,14 @@ function App() {
         <Route path="/employees" element={<EmployeeList />} />
         <Route path="/create-employee" element={<CreateUpdateEmployee mode="create" />} />
         <Route path="/update-employee/:id" element={<CreateUpdateEmployee mode="edit" />} />
+        <Route path="/leave" element={<Leave />} />
+        <Route path="/leave/:employeeId" element={<Leave />} />
+        <Route path="/attendance" element={<Attendance />} />
+        <Route path="/attendance/:employeeId" element={<Attendance />} />
+        <Route path="/performance" element={<Performance />} />
+        <Route path="/performance/:employeeId" element={<Performance />} />
+        <Route path="/payroll" element={<Payroll />} />
+        <Route path="/payroll/:employeeId" element={<Payroll />} />
       </Routes>
     </Router>
   );
