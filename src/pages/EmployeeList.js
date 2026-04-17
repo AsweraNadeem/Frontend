@@ -92,22 +92,21 @@ export default function EmployeeList() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white shadow-xl rounded-2xl p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold flex items-center">
-              <Users className="mr-3 text-blue-600" />
-              Employee Management
-            </h1>
 
-            <Link
-              to="/create-employee"
-              className="bg-blue-600 text-white px-5 py-2 rounded-lg flex items-center"
-            >
-              <Plus className="mr-2" />
-              Add Employee
-            </Link>
-          </div>
+        {/* Header */}
+        <div className="bg-white shadow-xl rounded-2xl p-6 mb-6 flex justify-between items-center">
+          <h1 className="text-3xl font-bold flex items-center">
+            <Users className="mr-3 text-blue-600" />
+            Employee Management
+          </h1>
+
+          <Link
+            to="/create-employee"
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg flex items-center"
+          >
+            <Plus className="mr-2" />
+            Add Employee
+          </Link>
         </div>
 
         {/* Search */}
@@ -131,18 +130,13 @@ export default function EmployeeList() {
               <tr>
                 <th className="p-4">ID</th>
                 <th>Profile</th>
-                <th onClick={() => handleSort("name")} className="cursor-pointer">
-                  Name
-                </th>
-                <th onClick={() => handleSort("email")} className="cursor-pointer">
-                  Email
-                </th>
+                <th onClick={() => handleSort("name")} className="cursor-pointer">Name</th>
+                <th onClick={() => handleSort("email")} className="cursor-pointer">Email</th>
                 <th>Mobile</th>
+                <th>Designation</th> {/* ✅ ADDED */}
                 <th>Gender</th>
                 <th>Course</th>
-                <th onClick={() => handleSort("createdAt")} className="cursor-pointer">
-                  Join Date
-                </th>
+                <th onClick={() => handleSort("createdAt")} className="cursor-pointer">Join Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -150,9 +144,10 @@ export default function EmployeeList() {
             <tbody>
               {paginatedData.map((emp) => (
                 <tr key={emp._id} className="border-b hover:bg-gray-50">
+
                   <td className="p-4">{emp.id}</td>
 
-                  {/* Profile Image */}
+                  {/* Profile */}
                   <td>
                     <img
                       src={emp.image}
@@ -163,7 +158,7 @@ export default function EmployeeList() {
 
                   <td>{emp.name}</td>
 
-                  {/* ✅ FIXED EMAIL */}
+                  {/* Email */}
                   <td>
                     <div className="flex items-center text-blue-600">
                       <Mail className="mr-2 w-4 h-4" />
@@ -171,7 +166,7 @@ export default function EmployeeList() {
                     </div>
                   </td>
 
-                  {/* ✅ FIXED MOBILE */}
+                  {/* Mobile */}
                   <td>
                     <div className="flex items-center">
                       <Phone className="mr-2 w-4 h-4" />
@@ -179,18 +174,29 @@ export default function EmployeeList() {
                     </div>
                   </td>
 
+                  {/* ✅ DESIGNATION */}
+                  <td>
+                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
+                      {emp.designation}
+                    </span>
+                  </td>
+
+                  {/* Gender */}
                   <td>{emp.gender}</td>
 
+                  {/* Course */}
                   <td>
                     <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
                       {emp.course}
                     </span>
                   </td>
 
+                  {/* Join Date */}
                   <td>
                     {new Date(emp.createdAt).toLocaleDateString()}
                   </td>
 
+                  {/* Actions */}
                   <td>
                     <div className="flex gap-2">
                       <Link to={`/update-employee/${emp._id}`}>
@@ -202,13 +208,14 @@ export default function EmployeeList() {
                       </button>
                     </div>
                   </td>
+
                 </tr>
               ))}
             </tbody>
           </table>
 
           {/* Pagination */}
-          <div className="p-4 flex justify-between">
+          <div className="p-4 flex justify-between items-center">
             <span>
               Page {currentPage} of {totalPages}
             </span>
@@ -229,6 +236,7 @@ export default function EmployeeList() {
               </button>
             </div>
           </div>
+
         </div>
       </div>
     </div>
