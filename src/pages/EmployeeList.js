@@ -38,7 +38,7 @@ export default function EmployeeList() {
     fetchEmployee();
   }, []);
 
-  // Search
+  // SEARCH
   useEffect(() => {
     let data = employees.filter(
       (emp) =>
@@ -50,7 +50,7 @@ export default function EmployeeList() {
     setCurrentPage(1);
   }, [search, employees]);
 
-  // Sorting
+  // SORT
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -68,13 +68,14 @@ export default function EmployeeList() {
     setFilteredEmployees(sortedData);
   };
 
-  // Pagination
+  // PAGINATION
   const totalPages = Math.ceil(filteredEmployees.length / pageSize);
   const paginatedData = filteredEmployees.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
+  // DELETE
   const handleDelete = async (id) => {
     try {
       const res = await API.delete(`/employee/deleteEmployee/${id}`);
@@ -93,7 +94,7 @@ export default function EmployeeList() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
 
-        {/* Header */}
+        {/* HEADER */}
         <div className="bg-white shadow-xl rounded-2xl p-6 mb-6 flex justify-between items-center">
           <h1 className="text-3xl font-bold flex items-center">
             <Users className="mr-3 text-blue-600" />
@@ -109,7 +110,7 @@ export default function EmployeeList() {
           </Link>
         </div>
 
-        {/* Search */}
+        {/* SEARCH */}
         <div className="bg-white shadow rounded-xl p-4 mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-3 text-gray-400" />
@@ -123,9 +124,11 @@ export default function EmployeeList() {
           </div>
         </div>
 
-        {/* Table */}
+        {/* TABLE */}
         <div className="bg-white shadow rounded-xl overflow-hidden">
           <table className="w-full">
+
+            {/* HEADER ROW */}
             <thead className="bg-blue-600 text-white">
               <tr>
                 <th className="p-4">ID</th>
@@ -133,21 +136,27 @@ export default function EmployeeList() {
                 <th onClick={() => handleSort("name")} className="cursor-pointer">Name</th>
                 <th onClick={() => handleSort("email")} className="cursor-pointer">Email</th>
                 <th>Mobile</th>
-                <th>Designation</th> {/* ✅ ADDED */}
+
+                {/* ✅ ADDED DESIGNATION HEADER */}
+                <th>Designation</th>
+
                 <th>Gender</th>
                 <th>Course</th>
-                <th onClick={() => handleSort("createdAt")} className="cursor-pointer">Join Date</th>
+                <th onClick={() => handleSort("createdAt")} className="cursor-pointer">
+                  Join Date
+                </th>
                 <th>Actions</th>
               </tr>
             </thead>
 
+            {/* BODY ROWS */}
             <tbody>
               {paginatedData.map((emp) => (
                 <tr key={emp._id} className="border-b hover:bg-gray-50">
 
                   <td className="p-4">{emp.id}</td>
 
-                  {/* Profile */}
+                  {/* PROFILE */}
                   <td>
                     <img
                       src={emp.image}
@@ -158,7 +167,7 @@ export default function EmployeeList() {
 
                   <td>{emp.name}</td>
 
-                  {/* Email */}
+                  {/* EMAIL */}
                   <td>
                     <div className="flex items-center text-blue-600">
                       <Mail className="mr-2 w-4 h-4" />
@@ -166,7 +175,7 @@ export default function EmployeeList() {
                     </div>
                   </td>
 
-                  {/* Mobile */}
+                  {/* MOBILE */}
                   <td>
                     <div className="flex items-center">
                       <Phone className="mr-2 w-4 h-4" />
@@ -174,29 +183,29 @@ export default function EmployeeList() {
                     </div>
                   </td>
 
-                  {/* ✅ DESIGNATION */}
+                  {/* ✅ DESIGNATION DATA */}
                   <td>
                     <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
                       {emp.designation}
                     </span>
                   </td>
 
-                  {/* Gender */}
+                  {/* GENDER */}
                   <td>{emp.gender}</td>
 
-                  {/* Course */}
+                  {/* COURSE */}
                   <td>
                     <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
                       {emp.course}
                     </span>
                   </td>
 
-                  {/* Join Date */}
+                  {/* JOIN DATE */}
                   <td>
                     {new Date(emp.createdAt).toLocaleDateString()}
                   </td>
 
-                  {/* Actions */}
+                  {/* ACTIONS */}
                   <td>
                     <div className="flex gap-2">
                       <Link to={`/update-employee/${emp._id}`}>
@@ -214,7 +223,7 @@ export default function EmployeeList() {
             </tbody>
           </table>
 
-          {/* Pagination */}
+          {/* PAGINATION */}
           <div className="p-4 flex justify-between items-center">
             <span>
               Page {currentPage} of {totalPages}
