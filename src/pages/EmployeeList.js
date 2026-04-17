@@ -20,7 +20,6 @@ export default function EmployeeList() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
-
   const [loading, setLoading] = useState(true);
 
   const [sortConfig, setSortConfig] = useState({
@@ -28,40 +27,30 @@ export default function EmployeeList() {
     direction: "asc",
   });
 
-  // ✅ FETCH DATA (with proper loading control)
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
         setLoading(true);
-
         const res = await API.get("/employee/getAllEmployee");
-
-        const data = res.data.employees || [];
-
-        setEmployees(data);
-        setFilteredEmployees(data);
+        setEmployees(res.data.employees);
+        setFilteredEmployees(res.data.employees);
       } catch (err) {
         console.error(err);
-        toast.error("Failed to load employees");
       } finally {
         setLoading(false);
       }
     };
-
     fetchEmployee();
   }, []);
 
   // SEARCH
   useEffect(() => {
-    if (!employees.length) return;
-
-    const query = search.toLowerCase();
-
     const data = employees.filter((emp) => {
+      const query = search.toLowerCase();
       return (
-        emp.name?.toLowerCase().includes(query) ||
-        emp.email?.toLowerCase().includes(query) ||
-        emp.id?.toString().includes(query)
+        emp.name.toLowerCase().includes(query) ||
+        emp.email.toLowerCase().includes(query) ||
+        emp.id.toString().includes(query)
       );
     });
 
@@ -89,7 +78,6 @@ export default function EmployeeList() {
 
   // PAGINATION
   const totalPages = Math.ceil(filteredEmployees.length / pageSize);
-
   const paginatedData = filteredEmployees.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
@@ -99,14 +87,11 @@ export default function EmployeeList() {
   const handleDelete = async (id) => {
     try {
       const res = await API.delete(`/employee/deleteEmployee/${id}`);
-
       if (res.data.success) {
         const updated = employees.filter((emp) => emp._id !== id);
-
         setEmployees(updated);
         setFilteredEmployees(updated);
-
-        toast.success("Deleted successfully");
+        toast.success("Employee deleted successfully");
       }
     } catch (err) {
       toast.error("Delete failed");
@@ -118,15 +103,17 @@ export default function EmployeeList() {
       <div className="max-w-7xl mx-auto">
 
         {/* HEADER */}
-        <div className="bg-white shadow rounded-2xl p-6 flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 flex justify-between items-center">
+          <div className="flex items-center gap-3">
             <Users className="text-blue-600" />
-            <h1 className="text-2xl font-bold">Employee Management</h1>
+            <h1 className="text-2xl font-bold text-gray-800">
+              Employee Management
+            </h1>
           </div>
 
           <Link
             to="/create-employee"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl flex items-center gap-2 transition"
           >
             <Plus size={18} />
             Add Employee
@@ -134,12 +121,12 @@ export default function EmployeeList() {
         </div>
 
         {/* SEARCH */}
-        <div className="bg-white p-4 rounded-xl shadow mb-6">
+        <div className="bg-white rounded-xl shadow p-4 mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-3 text-gray-400" />
             <input
-              className="w-full pl-10 pr-4 py-2 border rounded-lg"
-              placeholder="Search employees..."
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              placeholder="Search by name, email, or ID..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -148,138 +135,131 @@ export default function EmployeeList() {
 
         {/* TABLE */}
         <div className="bg-white rounded-xl shadow overflow-hidden">
+          <div className="overflow-x-auto">
 
-          <table className="w-full text-sm">
-            <thead className="bg-blue-600 text-white">
-              <tr>
-                <th className="p-4">ID</th>
-                <th>Profile</th>
-                <th onClick={() => handleSort("name")} className="cursor-pointer">Name</th>
-                <th>Email</th>
-                <th>Mobile</th>
-                <th>Designation</th>
-                <th>Gender</th>
-                <th>Course</th>
-                <th onClick={() => handleSort("createdAt")} className="cursor-pointer">
-                  Join Date
-                </th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-
-              {/* ✅ LOADING STATE (IMPORTANT FIX) */}
-              {loading ? (
-                Array.from({ length: 8 }).map((_, i) => (
-                  <tr key={i} className="animate-pulse border-b">
-                    <td className="p-4 text-gray-300">----</td>
-                    <td>
-                      <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                    </td>
-                    <td className="text-gray-300">Loading...</td>
-                    <td className="text-gray-300">Loading...</td>
-                    <td className="text-gray-300">Loading...</td>
-                    <td className="text-gray-300">---</td>
-                    <td className="text-gray-300">---</td>
-                    <td className="text-gray-300">---</td>
-                    <td className="text-gray-300">---</td>
-                    <td></td>
-                  </tr>
-                ))
-              ) : paginatedData.length === 0 ? (
+            <table className="w-full text-sm text-left">
+              <thead className="bg-blue-600 text-white sticky top-0">
                 <tr>
-                  <td colSpan="10" className="text-center p-10 text-gray-500">
-                    No employees found
-                  </td>
+                  <th className="p-4">ID</th>
+                  <th>Profile</th>
+                  <th className="cursor-pointer" onClick={() => handleSort("name")}>Name</th>
+                  <th className="cursor-pointer" onClick={() => handleSort("email")}>Email</th>
+                  <th>Mobile</th>
+                  <th>Designation</th>
+                  <th>Gender</th>
+                  <th>Course</th>
+                  <th className="cursor-pointer" onClick={() => handleSort("createdAt")}>
+                    Join Date
+                  </th>
+                  <th>Actions</th>
                 </tr>
-              ) : (
-                paginatedData.map((emp) => (
-                  <tr key={emp._id} className="border-b hover:bg-gray-50">
+              </thead>
 
-                    <td className="p-4">{emp.id}</td>
-
-                    <td>
-                      <img
-                        src={emp.image}
-                        className="w-10 h-10 rounded-full object-cover"
-                        alt=""
-                      />
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="10" className="text-center p-10 text-gray-500">
+                      Loading employees...
                     </td>
-
-                    <td className="font-medium">{emp.name}</td>
-
-                    <td className="flex items-center gap-2 text-blue-600">
-                      <Mail size={14} />
-                      {emp.email}
-                    </td>
-
-                    <td className="flex items-center gap-2">
-                      <Phone size={14} />
-                      {emp.mobile}
-                    </td>
-
-                    <td>
-                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
-                        {emp.designation}
-                      </span>
-                    </td>
-
-                    <td>{emp.gender}</td>
-
-                    <td>
-                      <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">
-                        {emp.course}
-                      </span>
-                    </td>
-
-                    <td>
-                      {new Date(emp.createdAt).toLocaleDateString()}
-                    </td>
-
-                    <td>
-                      <div className="flex gap-2">
-                        <Link to={`/update-employee/${emp._id}`}>
-                          <Edit className="text-blue-600" />
-                        </Link>
-
-                        <button onClick={() => handleDelete(emp._id)}>
-                          <Trash2 className="text-red-600" />
-                        </button>
-                      </div>
-                    </td>
-
                   </tr>
-                ))
-              )}
+                ) : paginatedData.length === 0 ? (
+                  <tr>
+                    <td colSpan="10" className="text-center p-10 text-gray-500">
+                      No employees found
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedData.map((emp, index) => (
+                    <tr
+                      key={emp._id}
+                      className={`border-b hover:bg-gray-50 transition ${
+                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      }`}
+                    >
+                      <td className="p-4 font-medium text-gray-700">
+                        {emp.id}
+                      </td>
 
-            </tbody>
-          </table>
+                      <td>
+                        <img
+                          src={emp.image}
+                          alt="profile"
+                          className="w-10 h-10 rounded-full object-cover border"
+                        />
+                      </td>
+
+                      <td className="font-medium text-gray-800">{emp.name}</td>
+
+                      <td className="text-blue-600 flex items-center gap-2">
+                        <Mail size={14} /> {emp.email}
+                      </td>
+
+                      <td className="flex items-center gap-2 text-gray-700">
+                        <Phone size={14} /> {emp.mobile}
+                      </td>
+
+                      <td>
+                        <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                          {emp.designation}
+                        </span>
+                      </td>
+
+                      <td className="text-gray-700">{emp.gender}</td>
+
+                      <td>
+                        <span className="px-2 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
+                          {emp.course}
+                        </span>
+                      </td>
+
+                      <td className="text-gray-600">
+                        {new Date(emp.createdAt).toLocaleDateString()}
+                      </td>
+
+                      <td>
+                        <div className="flex gap-3">
+                          <Link to={`/update-employee/${emp._id}`}>
+                            <Edit className="text-blue-600 hover:scale-110 transition" />
+                          </Link>
+
+                          <button onClick={() => handleDelete(emp._id)}>
+                            <Trash2 className="text-red-600 hover:scale-110 transition" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
 
           {/* PAGINATION */}
           <div className="flex justify-between items-center p-4 border-t">
-            <span>
-              Page {currentPage} of {totalPages}
+            <span className="text-sm text-gray-600">
+              Page <b>{currentPage}</b> of <b>{totalPages}</b>
             </span>
 
             <div className="flex gap-2">
               <button
-                disabled={currentPage === 1}
+                className="p-2 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
                 onClick={() => setCurrentPage((p) => p - 1)}
+                disabled={currentPage === 1}
               >
                 <ChevronLeft />
               </button>
 
               <button
+                className="p-2 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
+                onClick={() => setCurrentPage((p) => p + 1)}
                 disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => p - 1)}
               >
                 <ChevronRight />
               </button>
             </div>
           </div>
-
         </div>
+
       </div>
     </div>
   );
