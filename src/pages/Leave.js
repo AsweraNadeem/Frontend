@@ -77,7 +77,7 @@ export default function Leave() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold mb-6 text-green-600 text-center">
-          Leave Management SYSTEMS
+          LEAVE MANAGEMENT SYSTEMS
         </h2>
 
         <div className="bg-white shadow-xl rounded-2xl p-8 mb-8">
