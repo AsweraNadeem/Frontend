@@ -49,7 +49,7 @@ export default function Attendance() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4 text-blue-600">Attendance</h2>
+      <h2 className="text-2xl font-bold mb-4 text-blue-600">ATTENDANCE</h2>
 
       <form onSubmit={handleSubmit} className="space-y-3 bg-white p-5 rounded shadow">
         <input
