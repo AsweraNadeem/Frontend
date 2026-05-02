@@ -2,54 +2,63 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api";
 import toast from "react-hot-toast";
-import { useAuth } from "../context/AuthContext"; // Adjust path to your context
+import { LogIn } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setAuth } = useAuth(); // Your global state setter
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await API.post("/auth/login", { email, password });
       
       if (res.data.token) {
-        // Save the userId into the Global Auth State
-        setAuth({
-          token: res.data.token,
-          userId: res.data.userId,
-          email: res.data.email
-        });
-        toast.success("Welcome back!");
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userId", res.data.userId); // CRITICAL: Save the ID
+        localStorage.setItem("email", res.data.email);
+        
+        toast.success("Logged In successfully");
         navigate("/dashboard");
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "Invalid Credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form onSubmit={handleLogin} className="p-8 bg-white shadow-md rounded-lg">
-        <h2 className="mb-4 text-2xl font-bold">Login</h2>
-        <input 
-          type="email" 
-          placeholder="Email" 
-          onChange={(e) => setEmail(e.target.value)} 
-          className="w-full p-2 mb-4 border rounded"
-          required 
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          onChange={(e) => setPassword(e.target.value)} 
-          className="w-full p-2 mb-4 border rounded"
-          required 
-        />
-        <button className="w-full bg-blue-600 text-white p-2 rounded">Sign In</button>
-      </form>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl">
+        <h2 className="text-3xl font-bold text-center mb-8">Sign In</h2>
+        <form onSubmit={handleLogin} className="space-y-6">
+          <input
+            type="email"
+            placeholder="Email Address"
+            className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"
+          >
+            {loading ? "Processing..." : "Login"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
