@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, LayoutDashboard, ClipboardList, Users, Calendar, Award, CreditCard } from "lucide-react";
+import { LogOut, LayoutDashboard, ClipboardList, Users, Calendar, Award, CreditCard, TrendingUp } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -13,7 +13,6 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  // Helper to highlight active link with a more modern "pill" style
   const isActive = (path) =>
     location.pathname === path 
       ? "bg-blue-600 text-white shadow-md" 
@@ -23,7 +22,6 @@ export default function Navbar() {
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center px-6 py-3">
         
-        {/* Brand/Logo */}
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2">
             <div className="bg-blue-600 p-1.5 rounded-lg">
@@ -34,20 +32,19 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Navigation Links (Only shown when logged in) */}
           {token && (
             <div className="hidden md:flex items-center space-x-1 font-medium text-sm">
               <NavLink to="/dashboard" icon={<LayoutDashboard size={16}/>} label="Dashboard" active={isActive("/dashboard")} />
               <NavLink to="/tasks" icon={<ClipboardList size={16}/>} label="Tasks" active={isActive("/tasks")} />
               <NavLink to="/employees" icon={<Users size={16}/>} label="Employees" active={isActive("/employees")} />
-              <NavLink to="/leave" icon={<Calendar size={16}/>} label="Leave" active={isActive("/leave")} />
               <NavLink to="/attendance" icon={<Award size={16}/>} label="Attendance" active={isActive("/attendance")} />
+              <NavLink to="/leave" icon={<Calendar size={16}/>} label="Leave" active={isActive("/leave")} />
+              <NavLink to="/performance" icon={<TrendingUp size={16}/>} label="Performance" active={isActive("/performance")} />
               <NavLink to="/payroll" icon={<CreditCard size={16}/>} label="Payroll" active={isActive("/payroll")} />
             </div>
           )}
         </div>
 
-        {/* Right Side Action Area */}
         <div className="flex items-center gap-4">
           {token ? (
             <>
@@ -65,16 +62,10 @@ export default function Navbar() {
             </>
           ) : (
             <div className="flex items-center gap-3">
-              <Link
-                to="/login"
-                className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-blue-600 transition"
-              >
+              <Link to="/login" className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-blue-600 transition">
                 Sign In
               </Link>
-              <Link
-                to="/register"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-blue-200 shadow-lg transition-all"
-              >
+              <Link to="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-blue-200 shadow-lg transition-all">
                 Get Started
               </Link>
             </div>
@@ -85,15 +76,14 @@ export default function Navbar() {
   );
 }
 
-// Sub-component for cleaner code
 function NavLink({ to, icon, label, active }) {
   return (
     <Link
       to={to}
-      className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${active}`}
+      className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 ${active}`}
     >
       {icon}
-      <span>{label}</span>
+      <span className="whitespace-nowrap">{label}</span>
     </Link>
   );
 }
