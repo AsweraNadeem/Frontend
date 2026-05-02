@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, LogIn, UserPlus } from "lucide-react";
+import { Mail, Lock, LogIn } from "lucide-react";
 import API from "../api";
 import toast from "react-hot-toast";
 
@@ -15,15 +15,25 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // Calls your backend at http://localhost:5000/auth/login
-      const res = await API.post("/auth/login", { email, password });
+      // Calls your Vercel backend
+      const res = await API.post("/auth/login", { 
+        email: email.toLowerCase().trim(), 
+        password 
+      });
       
-      toast.success("Logged In successfully");
-
-      // Store the JWT and user email for the session
       if (res.data.token) {
+        // 1. Store the JWT Token
         localStorage.setItem("token", res.data.token);
+        
+        // 2. STORE THE USER ID (This is the critical fix for your 500 error)
+        // We use userId or _id depending on what your backend returns
+        const userId = res.data.userId || res.data._id;
+        localStorage.setItem("userId", userId);
+        
+        // 3. Store the email
         localStorage.setItem("email", res.data.email || email);
+        
+        toast.success("Logged In successfully");
         navigate("/dashboard");
       }
     } catch (err) {
@@ -47,7 +57,7 @@ export default function Login() {
           <p className="text-gray-600">Sign in to access your dashboard</p>
         </div>
 
-        {/* Login Form */}
+        {/* Login Form Card */}
         <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-100">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
@@ -66,7 +76,7 @@ export default function Login() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 outline-none"
                   required
                 />
               </div>
@@ -83,7 +93,7 @@ export default function Login() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 outline-none"
                   required
                 />
               </div>
@@ -92,7 +102,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center shadow-lg"
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center shadow-lg transform active:scale-95"
             >
               {loading ? (
                 <>
@@ -108,7 +118,7 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center border-t pt-6">
             <p className="text-gray-600">
               Don't have an account?{" "}
               <Link
