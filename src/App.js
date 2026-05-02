@@ -9,6 +9,7 @@ import Leave from "./pages/Leave";
 import Attendance from "./pages/Attendance";
 import Performance from "./pages/Performance";
 import Payroll from "./pages/Payroll";
+import TaskManagement from "./pages/TaskManagement"; // 👈 1. IMPORT THE NEW PAGE
 import "./App.css";
 import { Toaster } from "react-hot-toast";
 
@@ -24,6 +25,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        
+        {/* 👈 2. ADD THE TASK ROUTES HERE */}
+        <Route path="/tasks" element={<TaskManagement />} />
+        <Route path="/tasks/:employeeId" element={<TaskManagement />} />
+
         <Route path="/employees" element={<EmployeeList />} />
         <Route path="/create-employee" element={<CreateUpdateEmployee mode="create" />} />
         <Route path="/update-employee/:id" element={<CreateUpdateEmployee mode="edit" />} />
