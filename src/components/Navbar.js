@@ -1,4 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { LogOut, LayoutDashboard, ClipboardList, Users, Calendar, Award, CreditCard } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -12,92 +13,87 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  // Helper to highlight active link
+  // Helper to highlight active link with a more modern "pill" style
   const isActive = (path) =>
-    location.pathname === path ? "bg-blue-300 text-blue-900" : "hover:bg-blue-200";
+    location.pathname === path 
+      ? "bg-blue-600 text-white shadow-md" 
+      : "text-slate-600 hover:bg-blue-50 hover:text-blue-600";
 
   return (
-    <nav className="bg-blue-100 shadow-md">
-      <div className="container mx-auto flex justify-between items-center px-4 py-3">
+    <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <div className="container mx-auto flex justify-between items-center px-6 py-3">
         
-        {/* Left side links */}
-        <div className="flex space-x-4 items-center font-medium">
-          {token ? (
-            <>
-              <Link
-                to="/"
-                className={`px-3 py-2 rounded-md transition ${isActive("/")}`}
-              >
-                Home
-              </Link>
-              <Link
-                to="/employees"
-                className={`px-3 py-2 rounded-md transition ${isActive("/employees")}`}
-              >
-                Employee List
-              </Link>
-              <Link
-                to="/leave"
-                className={`px-3 py-2 rounded-md transition ${isActive("/leave")}`}
-              >
-                Leave
-              </Link>
-              <Link
-                to="/attendance"
-                className={`px-3 py-2 rounded-md transition ${isActive("/attendance")}`}
-              >
-                Attendance
-              </Link>
-              <Link
-                to="/performance"
-                className={`px-3 py-2 rounded-md transition ${isActive("/performance")}`}
-              >
-                Performance
-              </Link>
-              <Link
-                to="/payroll"
-                className={`px-3 py-2 rounded-md transition ${isActive("/payroll")}`}
-              >
-                Payroll
-              </Link>
-            </>
-          ) : (
-            <h1 className="font-bold text-xl text-blue-900 tracking-wide">
-              Logo
-            </h1>
+        {/* Brand/Logo */}
+        <div className="flex items-center gap-8">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="bg-blue-600 p-1.5 rounded-lg">
+              <LayoutDashboard className="h-6 w-6 text-white" />
+            </div>
+            <span className="font-bold text-xl text-slate-800 tracking-tight hidden lg:block">
+              EMS Pro
+            </span>
+          </Link>
+
+          {/* Navigation Links (Only shown when logged in) */}
+          {token && (
+            <div className="hidden md:flex items-center space-x-1 font-medium text-sm">
+              <NavLink to="/dashboard" icon={<LayoutDashboard size={16}/>} label="Dashboard" active={isActive("/dashboard")} />
+              <NavLink to="/tasks" icon={<ClipboardList size={16}/>} label="Tasks" active={isActive("/tasks")} />
+              <NavLink to="/employees" icon={<Users size={16}/>} label="Employees" active={isActive("/employees")} />
+              <NavLink to="/leave" icon={<Calendar size={16}/>} label="Leave" active={isActive("/leave")} />
+              <NavLink to="/attendance" icon={<Award size={16}/>} label="Attendance" active={isActive("/attendance")} />
+              <NavLink to="/payroll" icon={<CreditCard size={16}/>} label="Payroll" active={isActive("/payroll")} />
+            </div>
           )}
         </div>
 
-        {/* Right side links */}
-        <div className="flex space-x-4 items-center">
+        {/* Right Side Action Area */}
+        <div className="flex items-center gap-4">
           {token ? (
             <>
-              <span className="font-medium text-blue-900 hidden md:flex">{userName}</span>
+              <div className="flex flex-col items-end mr-2 hidden sm:block">
+                <span className="text-xs text-slate-400 font-medium leading-none">Logged in as</span>
+                <span className="text-sm font-semibold text-slate-700">{userName.split('@')[0]}</span>
+              </div>
               <button
                 onClick={logout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition"
+                className="flex items-center gap-2 bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-600 px-4 py-2 rounded-xl font-bold text-sm transition-all border border-transparent hover:border-red-100"
               >
-                Logout
+                <LogOut size={16} />
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </>
           ) : (
-            <>
+            <div className="flex items-center gap-3">
               <Link
                 to="/login"
-                className="px-3 py-2 rounded-md font-medium text-blue-900 hover:bg-blue-200 transition"
+                className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-blue-600 transition"
               >
-                Login
+                Sign In
               </Link>
               <Link
                 to="/register"
-                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg font-medium shadow-sm transition"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-blue-200 shadow-lg transition-all"
               >
-                Register
+                Get Started
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>
     </nav>
+  );
+}
+
+// Sub-component for cleaner code
+function NavLink({ to, icon, label, active }) {
+  return (
+    <Link
+      to={to}
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${active}`}
+    >
+      {icon}
+      <span>{label}</span>
+    </Link>
   );
 }
