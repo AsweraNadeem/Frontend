@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, LayoutDashboard, ClipboardList, Users, Calendar, Award, CreditCard, TrendingUp } from "lucide-react";
+import { LogOut, LayoutDashboard, ClipboardList, Users, Calendar, Award, CreditCard, TrendingUp, Landmark } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -10,6 +10,7 @@ export default function Navbar() {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
+    localStorage.removeItem("userId"); // Good practice to clear userId too
     navigate("/login");
   };
 
@@ -41,6 +42,7 @@ export default function Navbar() {
               <NavLink to="/leave" icon={<Calendar size={16}/>} label="Leave" active={isActive("/leave")} />
               <NavLink to="/performance" icon={<TrendingUp size={16}/>} label="Performance" active={isActive("/performance")} />
               <NavLink to="/payroll" icon={<CreditCard size={16}/>} label="Payroll" active={isActive("/payroll")} />
+              <NavLink to="/loans" icon={<Landmark size={16}/>} label="Loans" active={isActive("/loans")} />
             </div>
           )}
         </div>
