@@ -10,7 +10,8 @@ import Attendance from "./pages/Attendance";
 import Performance from "./pages/Performance";
 import Payroll from "./pages/Payroll";
 import TaskManagement from "./pages/TaskManagement";
-import LoanManagement from "./pages/LoanManagement"; // 👈 1. IMPORT LOAN MANAGEMENT
+import LoanManagement from "./pages/LoanManagement";
+import AssetManagement from "./pages/AssetManagement"; // 👈 1. IMPORT ASSET MANAGEMENT
 import "./App.css";
 import { Toaster } from "react-hot-toast";
 
@@ -31,9 +32,13 @@ function App() {
         <Route path="/tasks" element={<TaskManagement />} />
         <Route path="/tasks/:employeeId" element={<TaskManagement />} />
 
-        {/* 👈 2. ADD THE LOAN ROUTES HERE */}
+        {/* Loan Routes */}
         <Route path="/loans" element={<LoanManagement />} />
         <Route path="/loans/:employeeId" element={<LoanManagement />} />
+
+        {/* 👈 2. ADD THE ASSET ROUTES HERE */}
+        <Route path="/assets" element={<AssetManagement />} />
+        <Route path="/assets/:employeeId" element={<AssetManagement />} />
 
         <Route path="/employees" element={<EmployeeList />} />
         <Route path="/create-employee" element={<CreateUpdateEmployee mode="create" />} />
