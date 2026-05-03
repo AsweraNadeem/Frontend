@@ -1,5 +1,4 @@
-App.js
-
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
@@ -14,7 +13,7 @@ import Payroll from "./pages/Payroll";
 import TaskManagement from "./pages/TaskManagement";
 import LoanManagement from "./pages/LoanManagement";
 import AssetManagement from "./pages/AssetManagement";
-import AnnouncementManagement from "./pages/AnnouncementManagement"; // 👈 1. IMPORT ANNOUNCEMENT PAGE
+import AnnouncementManagement from "./pages/AnnouncementManagement";
 import "./App.css";
 import { Toaster } from "react-hot-toast";
 
@@ -26,28 +25,25 @@ function App() {
       <Toaster position="top-right" reverseOrder={false} />
       <Navbar />
       <Routes>
-        {/* Redirect logic based on auth status */}
         <Route path="/" element={token ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         
-        {/* Task & Workflow Routes */}
+        {/* Workflow Routes */}
         <Route path="/tasks" element={<TaskManagement />} />
         <Route path="/tasks/:employeeId" element={<TaskManagement />} />
 
-        {/* Finance & Loan Routes */}
+        {/* Finance & Assets */}
         <Route path="/loans" element={<LoanManagement />} />
         <Route path="/loans/:employeeId" element={<LoanManagement />} />
-
-        {/* Inventory & Asset Routes */}
         <Route path="/assets" element={<AssetManagement />} />
         <Route path="/assets/:employeeId" element={<AssetManagement />} />
 
-        {/* 👈 2. ADD ANNOUNCEMENT / BROADCAST ROUTES HERE */}
+        {/* Announcements */}
         <Route path="/announcements" element={<AnnouncementManagement />} />
 
-        {/* HR & Employee Management Routes */}
+        {/* HR Management */}
         <Route path="/employees" element={<EmployeeList />} />
         <Route path="/create-employee" element={<CreateUpdateEmployee mode="create" />} />
         <Route path="/update-employee/:id" element={<CreateUpdateEmployee mode="edit" />} />
