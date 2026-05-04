@@ -1,127 +1,71 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import API from "../api";
-import { 
-  LayoutDashboard, 
-  Megaphone, 
-  AlertCircle, 
-  Info, 
-  Users, 
-  CheckSquare, 
-  TrendingUp 
-} from "lucide-react";
+import { Megaphone, Send } from "lucide-react";
+import { toast } from "react-hot-toast";
 
-const Dashboard = () => {
-  const [announcements, setAnnouncements] = useState([]);
-  const [stats, setStats] = useState({ employees: 0, activeTasks: 0, performance: 0 });
-  const [loading, setLoading] = useState(true);
+const AnnouncementManagement = () => {
+  const [formData, setFormData] = useState({ title: "", message: "", priority: "Medium" });
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        // Fetching announcements and stats concurrently
-        const [announcementRes, statsRes] = await Promise.all([
-          API.get("/announcements"),
-          API.get("/employee/stats"), // Assuming you have a stats endpoint
-        ]);
-        
-        setAnnouncements(announcementRes.data);
-        setStats(statsRes.data);
-      } catch (err) {
-        console.error("Error loading dashboard data", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardData();
-  }, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await API.post("/announcements", formData);
+      toast.success("Announcement broadcasted successfully!");
+      setFormData({ title: "", message: "", priority: "Medium" });
+    } catch (err) {
+      toast.error("Failed to post announcement");
+    }
+  };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 md:p-10 min-h-screen bg-slate-50">
-      {/* HEADER SECTION */}
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-2xl mx-auto p-10 bg-white shadow-xl rounded-3xl mt-10">
+      <div className="flex items-center gap-3 mb-6">
+        <Megaphone className="text-blue-600 w-8 h-8" />
+        <h1 className="text-2xl font-bold text-slate-800">Create Broadcast</h1>
+      </div>
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Welcome Back</h1>
-          <p className="text-slate-500">Here's what's happening with your team today.</p>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+          <input
+            type="text"
+            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            required
+          />
         </div>
-        <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
-            <LayoutDashboard className="text-blue-600 h-6 w-6" />
+        
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Priority</label>
+          <select 
+            className="w-full p-3 border rounded-xl outline-none"
+            value={formData.priority}
+            onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
         </div>
-      </div>
 
-      {/* ANNOUNCEMENT BROADCAST SECTION */}
-      {announcements.length > 0 && (
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-4">
-            <Megaphone className="text-blue-600 h-5 w-5" />
-            <h2 className="text-lg font-bold text-slate-700">Recent Announcements</h2>
-          </div>
-          <div className="grid gap-4">
-            {announcements.map((item) => (
-              <div 
-                key={item._id} 
-                className={`p-5 rounded-2xl border-l-4 bg-white shadow-sm transition-transform hover:scale-[1.01] ${
-                  item.priority === 'High' ? 'border-red-500 bg-red-50/30' : 'border-blue-500'
-                }`}
-              >
-                <div className="flex gap-4">
-                  <div className={`p-2 rounded-xl h-fit ${
-                    item.priority === 'High' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'
-                  }`}>
-                    {item.priority === 'High' ? <AlertCircle size={20} /> : <Info size={20} />}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
-                      <h3 className="font-bold text-slate-800">{item.title}</h3>
-                      <span className="text-[10px] uppercase font-bold text-slate-400">
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p className="text-sm text-slate-600 mt-1">{item.message}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Message</label>
+          <textarea
+            rows="4"
+            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            required
+          ></textarea>
         </div>
-      )}
 
-      {/* STATISTICS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard 
-          icon={<Users className="text-blue-600" />} 
-          label="Total Employees" 
-          value={stats.employees} 
-          color="bg-blue-50" 
-        />
-        <StatCard 
-          icon={<CheckSquare className="text-emerald-600" />} 
-          label="Active Tasks" 
-          value={stats.activeTasks} 
-          color="bg-emerald-50" 
-        />
-        <StatCard 
-          icon={<TrendingUp className="text-purple-600" />} 
-          label="Avg Performance" 
-          value={`${stats.performance}%`} 
-          color="bg-purple-50" 
-        />
-      </div>
+        <button type="submit" className="w-full bg-blue-600 text-white p-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700">
+          <Send size={18} /> Post Announcement
+        </button>
+      </form>
     </div>
   );
 };
 
-// Reusable Stat Card Component
-const StatCard = ({ icon, label, value, color }) => (
-  <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-5">
-    <div className={`p-4 rounded-2xl ${color}`}>
-      {icon}
-    </div>
-    <div>
-      <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">{label}</p>
-      <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
-    </div>
-  </div>
-);
-
-export default Dashboard;
+export default AnnouncementManagement;
