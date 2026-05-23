@@ -12,44 +12,28 @@ const Dashboard = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Changed to dynamic state (initialized with 0s)
-  const [stats, setStats] = useState({ 
-    employees: 0,        
-    activeTasks: 0,       
-    performance: 0       
+  // 1. Static values for the bottom row stats
+  const [stats] = useState({ 
+    employees: 25,        
+    activeTasks: 8,       
+    performance: 92       
   });
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchAnnouncements = async () => {
       try {
-        setLoading(true);
-        
-        // 2. Fetch both Announcements and the new Stats concurrently
-        const [annRes, statsRes] = await Promise.all([
-          API.get("/announcements"),
-          API.get("/api/stats") // This calls your api/stats.js file
-        ]);
-
-        // Process Announcements
-        const annData = Array.isArray(annRes.data) ? annRes.data : annRes.data.data || [];
-        setAnnouncements(annData);
-
-        // 3. Update stats with real data from your MongoDB "test" database
-        if (statsRes.data) {
-          setStats({
-            employees: statsRes.data.totalEmployees || 0,
-            activeTasks: statsRes.data.activeTasks || 0,
-            performance: statsRes.data.avgPerformance || 92
-          });
-        }
+        // 2. Dynamic fetch for announcements only
+        const res = await API.get("/announcements");
+        const data = Array.isArray(res.data) ? res.data : res.data.data || [];
+        setAnnouncements(data);
       } catch (err) {
-        console.error("Error fetching dashboard data:", err);
+        console.error("Error fetching announcements:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDashboardData();
+    fetchAnnouncements();
   }, []);
 
   return (
@@ -100,19 +84,19 @@ const Dashboard = () => {
         <StatCard 
           icon={<Users className="text-blue-600" />} 
           label="Total Employees" 
-          value={loading ? "..." : stats.employees} 
+          value={stats.employees} 
           color="bg-blue-50" 
         />
         <StatCard 
           icon={<CheckSquare className="text-emerald-600" />} 
           label="Active Tasks" 
-          value={loading ? "..." : stats.activeTasks} 
+          value={stats.activeTasks} 
           color="bg-emerald-50" 
         />
         <StatCard 
           icon={<TrendingUp className="text-purple-600" />} 
           label="Avg Performance" 
-          value={loading ? "..." : `${stats.performance}%`} 
+          value={`${stats.performance}%`} 
           color="bg-purple-50" 
         />
       </div>
@@ -130,4 +114,5 @@ const StatCard = ({ icon, label, value, color }) => (
   </div>
 );
 
+// THIS IS THE LINE VERCEL IS COMPLAINING ABOUT:
 export default Dashboard;
