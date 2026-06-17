@@ -1,12 +1,15 @@
 import { useEffect, useState, useCallback } from "react";
 import API from "../api";
 import toast from "react-hot-toast";
-import { Wallet, Send, History, FileText, Info, Calendar } from "lucide-react";
+import { Wallet, Send, History, FileText, Info, Calendar, CheckCircle2, XCircle } from "lucide-react";
 
 export default function LoanManagement() {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+
+  // Simulation Toggle: Switch between true/false to manage admin testing flows directly
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [loanRequest, setLoanRequest] = useState({
     loanType: "Personal",
@@ -62,17 +65,78 @@ export default function LoanManagement() {
     }
   };
 
+  // --- NEW: Dynamic Action Handler targeting your PUT /loans/approve/:id route ---
+  const handleAdminAction = async (loanId, targetStatus) => {
+    let payload = {
+      approvalStatus: targetStatus,
+      approverId: employeeId, // Simulating current user as the processing authority
+    };
+
+    if (targetStatus === "Disbursed" || targetStatus === "Approved") {
+      const sanctioned = prompt("Enter Sanctioned Amount (PKR):");
+      const rate = prompt("Enter Interest Rate (%):", "0");
+      const startDate = prompt("Enter Repayment Start Date (YYYY-MM-DD):", "2026-07-01");
+
+      if (!sanctioned || !rate || !startDate) {
+        return toast.error("Sanctioned amount, interest rate, and start date are required!");
+      }
+
+      payload = {
+        ...payload,
+        sanctionedAmount: Number(sanctioned),
+        interestRate: Number(rate),
+        repaymentStartDate: startDate,
+        approverRemarks: "Approved and authorized via workspace application.",
+      };
+    } else if (targetStatus === "Rules-Rejected" || targetStatus === "Rejected") {
+      const remarks = prompt("Enter reason for rejection:");
+      if (!remarks) return toast.error("Remarks are required to reject an application.");
+      payload.approvalStatus = "Rejected";
+      payload.approverRemarks = remarks;
+    }
+
+    try {
+      // Calls your precise backend route schema
+      await API.put(`/loans/approve/${loanId}`, payload);
+      toast.success(`Loan state updated successfully to ${targetStatus}`);
+      fetchLoans();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Action authorization failed");
+    }
+  };
+
+  // Maps database validation flags to clean UI components
   const getStatusColor = (status) => {
     switch (status) {
       case "Approved": return "bg-green-100 text-green-700";
       case "Rejected": return "bg-red-100 text-red-700";
-      case "Disbursed": return "bg-blue-100 text-blue-700";
-      default: return "bg-yellow-100 text-yellow-700";
+      case "Disbursed": return "bg-teal-100 text-teal-700"; 
+      case "Pending":
+      default: return "bg-blue-100 text-blue-700";
     }
+  };
+
+  // Resolves the exact display label state conflict seen on your initial card UI
+  const getFooterStatusText = (approvalStatus, fallbackStatus) => {
+    if (approvalStatus === "Disbursed") return "Active";
+    if (approvalStatus === "Approved") return "Approved / Scheduled";
+    if (approvalStatus === "Rejected") return "Closed / Declined";
+    return "Awaiting Review"; 
   };
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8">
+      {/* Simulation Helper Control */}
+      <div className="bg-gray-50 border border-gray-200 p-3 rounded-xl mb-6 flex justify-between items-center text-xs">
+        <span className="font-semibold text-gray-500 uppercase tracking-wider">Workspace Interface Mode:</span>
+        <button 
+          onClick={() => setIsAdmin(!isAdmin)} 
+          className={`px-4 py-1.5 rounded-lg font-bold transition shadow-sm text-white ${isAdmin ? 'bg-purple-600' : 'bg-blue-600'}`}
+        >
+          {isAdmin ? "Switch to Employee View" : "Switch to Admin View"}
+        </button>
+      </div>
+
       <div className="flex items-center gap-3 mb-8">
         <Wallet className="text-blue-600 h-8 w-8" />
         <h1 className="text-2xl font-bold text-gray-800">Loan Management</h1>
@@ -165,23 +229,32 @@ export default function LoanManagement() {
               <div key={l._id} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm transition hover:shadow-md">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${getStatusColor(l.approvalStatus)}`}>
-                      {l.approvalStatus}
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${getStatusColor(l.approvalStatus || "Pending")}`}>
+                      {l.approvalStatus || "Pending"}
                     </span>
                     <h3 className="font-bold text-gray-800 mt-1">{l.loanType} Loan</h3>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-blue-600">PKR {l.requestedAmount.toLocaleString()}</p>
+                    {/* Render targeted final sanctioned amount dynamically if calculation passes */}
+                    <p className="text-lg font-bold text-blue-600">
+                      PKR {((l.approvalStatus === "Approved" || l.approvalStatus === "Disbursed") && l.sanctionedAmount)
+                        ? l.sanctionedAmount.toLocaleString() 
+                        : l.requestedAmount.toLocaleString()}
+                    </p>
                     <p className="text-xs text-gray-400">{l.tenureMonths} Months</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-3 border-t border-gray-50 text-xs text-gray-500">
-                  <span className="flex items-center gap-1"><Calendar size={14}/> {new Date(l.createdAt).toLocaleDateString()}</span>
-                  <span className="flex items-center gap-1"><Info size={14}/> {l.loanStatus}</span>
+                  <span className="flex items-center gap-1">
+                    <Calendar size={14}/> {new Date(l.createdAt).toLocaleDateString()}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Info size={14}/> {getFooterStatusText(l.approvalStatus || "Pending", l.loanStatus)}
+                  </span>
                   {l.emiAmount && (
                     <span className="flex items-center gap-1 font-semibold text-gray-700">
-                      <FileText size={14}/> EMI: PKR {l.emiAmount}
+                      <FileText size={14}/> EMI: PKR {Number(l.emiAmount).toLocaleString()}
                     </span>
                   )}
                 </div>
@@ -189,6 +262,24 @@ export default function LoanManagement() {
                 {l.approverRemarks && (
                   <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600 italic">
                     " {l.approverRemarks} "
+                  </div>
+                )}
+
+                {/* --- Inline Admin Controls Panel --- */}
+                {isAdmin && (l.approvalStatus === "Pending" || !l.approvalStatus) && (
+                  <div className="mt-4 pt-3 border-t border-dashed border-gray-200 flex gap-2 justify-end">
+                    <button
+                      onClick={() => handleAdminAction(l._id, "Rules-Rejected")}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 text-xs font-bold rounded-lg hover:bg-red-100 transition"
+                    >
+                      <XCircle size={14} /> Reject
+                    </button>
+                    <button
+                      onClick={() => handleAdminAction(l._id, "Disbursed")}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-teal-600 text-white text-xs font-bold rounded-lg hover:bg-teal-700 transition shadow-sm"
+                    >
+                      <CheckCircle2 size={14} /> Disburse & Activate
+                    </button>
                   </div>
                 )}
               </div>
